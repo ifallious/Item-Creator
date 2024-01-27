@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" media="screen" href="https://fontlibrary.org//face/minecraftia" type="text/css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI7 Item Creator</title>
+    <style>
+        body {
+            font-family: 'MinecraftiaRegular';
+            background-color: #1f1f1f;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        #preview {
+            font-size: 20px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #333333;
+            color: #ffffff;
+            width: 50%;
+            margin: 0;
+            text-align: center;
+        }
+        .stat-bar {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .offensive { color: red; }
+        .defensive { color: green; }
+        .mana { color: blue; }
+        .other { color: purple; }
+        .common { color: grey; }
+        .uncommon { color: lightgreen; }
+        .rare { color: lightblue; }
+        .epic { color: purple; }
+        .legendary { color: yellow; }
+        .mythic { color: pink; }
+        .admin { color: red; }
+        .event { color: yellow; }
+        input[type="text"],
+        button,
+        select {
+            background-color: #333333;
+            color: #cccccc;
+            border: 1px solid #555555;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+<label for="item">Item:</label>
+<input type="text" id="item"><br>
+
+<label for="tags">Tags:</label>
+<input type="text" id="tags">
+<button id="addTag">Add Tag</button><br>
+
+<label for="tagType">Tag Type:</label>
+<select id="tagType">
+    <option value="#color">#color</option>
+    <option value="#head">#head</option>
+    <option value="#glow">#glow</option>
+    <option value="#drop">#drop</option>
+    <option value="#big_item">#big_item</option>
+</select><br>
+
+<label for="color">Color (Hex):</label>
+<input type="text" id="color"><br>
+
+<label for="headOwner">Head Owner:</label>
+<input type="text" id="headOwner"><br>
+
+<label for="headId">Head ID:</label>
+<input type="text" id="headId"><br>
+
+<label for="headValue">Head Value:</label>
+<input type="text" id="headValue"><br>
+
+<input type="checkbox" id="headIdValueCheckbox"> Use ID/Value<br><br>
+
+<label for="name">Name:</label>
+<input type="text" id="name"><br>
+
+<label for="desc">Description:</label>
+<input type="text" id="desc"><br>
+
+<label for="rarity">Rarity:</label>
+<select id="rarity">
+    <option value="common">Common</option>
+    <option value="uncommon">Uncommon</option>
+    <option value="rare">Rare</option>
+    <option value="epic">Epic</option>
+    <option value="legendary">Legendary</option>
+    <option value="mythic">Mythic</option>
+    <option value="event">Event</option>
+    <option value="admin">Admin</option>
+</select><br>
+
+<label for="tier">Tier:</label>
+<select id="tier">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+</select><br>
+
+<label for="type">Type:</label>
+<select id="type">
+    <option value="Armor">Armor</option>
+    <option value="Weapon">Weapon</option>
+    <option value="Misc">Misc</option>
+</select><br>
+
+<label for="class">Class:</label>
+<select id="class">
+    <option value="">(No class penalties)</option>
+    <option value="Warrior">Warrior</option>
+    <option value="Archer">Archer</option>
+    <option value="Mage">Mage</option>
+</select><br>
+
+<label for="stats">Stats:</label>
+<input type="text" id="stats">
+<button id="addStat">Add Stat</button><br>
+
+<label for="statName">Stat Name:</label>
+<select id="statName">
+    <option value="max_hp">maximum HP</option>
+    <option value="defense">Defense</option>
+    <option value="def_buff">Defense buff</option>
+    <option value="evade">Evade</option>
+    <option value="hp_buff">Hp buff</option>
+    <option value="kb_def">Knockback Defense</option>
+    <option value="agility">Agility</option>
+    <option value="atk_spd">Attack Speed</option>
+    <option value="crit">Critical Chance</option>
+    <option value="damage">Damage</option>
+    <option value="dmg_buff">Damage Buff</option>
+    <option value="kb_atk">Attack Knockback</option>
+    <option value="mana_rgn">Mana Regeneration</option>
+    <option value="max_mana">maximum Mana</option>
+</select><br>
+
+<label for="statValue">Stat Value:</label>
+<input type="text" id="statValue"><br>
+
+<label for="enhanceAmount">Enhance Amount:</label>
+<input type="text" id="enhanceAmount"><br>
+
+<label for="enhancements">Enhancements:</label>
+<input type="text" id="enhancements"><br>
+
+<label for="bonusName">Bonus Name:</label>
+<input type="text" id="bonusName"><br>
+
+<label for="bonuses">Bonuses:</label>
+<input type="text" id="bonuses"><br>
+
+<button id="createButton">Create Item Command</button><br>
+
+<label for="result">Result:</label>
+<p id="result"></p>
+<div id="preview">
+    <p id="previewText"></p>
+</div>
+
+<script>
+    $(document).ready(function() {
+        function updatePreview() {
+            var name = $("#name").val();
+            var desc = $("#desc").val();
+            var itemType = $("#type").val();
+            var itemClass = $("#class").val();
+            var stats = $("#stats").val();
+            var enhancements = $("#enhancements").val();
+            var enhancementnumber = $("#enhanceAmount").val();
+            var bonusName = $("bonusName").val();
+            var bonuses = $("#bonuses").val();
+            var itemName = $("#item").val().replace(/\s/g, "_");
+            var itemTexture = `textures/${itemName}.png`;
+            var previewText = `<img src="${itemTexture}" alt="${name}" style="width: 150px; float: right; margin-left: 10px; image-rendering: pixelated;">`;
+            previewText += `<div style="text-align: left;">`;
+            previewText += `<div style="text-align: center; margin-bottom: 5px;">${name}</div>`;
+            previewText += `<span style="color: lightgrey; text-align: center; display: block; margin-bottom: 10px;">${desc}</span><br>`;
+            previewText += `<span style="color: white;">Class: </span><span style="color: blue;">${itemClass}</span><br>`;
+            previewText += `<span style="color: white;">Type: </span><span style="color: lightgreen;">${itemType}</span><br>`;
+            var rarity = $("#rarity").val().toLowerCase();
+            var rarityColorClass = rarity;
+            previewText += `<span style="color: white;">Rarity: </span><span class="rarity ${rarityColorClass}">${capitalizeFirstLetter(rarity)}</span><br>`;
+            if (itemType !== "Misc") {
+                if (stats) {
+                    var statsArray = stats.split('+');
+                    statsArray.forEach(function(stat) {
+                        var statParts = stat.split(':');
+                        var statName = getStatDisplayName(statParts[0]);
+                        var statValue = statParts[1];
+                        var statColorClass = getStatColorClass(statParts[0]);
+                        previewText += `<div class="stat-bar ${statColorClass}">${statName}: ${statValue}</div><br>`;
+                    });
+                }
+                if (enhancements) {
+                    var enhancementsArray = enhancements.split('+');
+                    previewText += `Enhancements: ${enhancementnumber}<br>`;
+                    enhancementsArray.forEach(function (enhancement) {
+                        var enhancementParts = enhancement.split(':');
+                        var enhancementName = getStatDisplayName(enhancementParts[0]);
+                        var enhancementValue = enhancementParts[1];
+                        var enhancementColorClass = getStatColorClass(enhancementParts[0]);
+                        previewText += `<div class="stat-bar ${enhancementColorClass}">${enhancementName}: ${enhancementValue}</div><br>`;
+                    });
+                }
+                if (itemType == "Armor") {
+                        var bonusesArray = bonuses.split('+');
+                        previewText += `Full Set Bonus: <br>`;
+                        bonusesArray.forEach(function (bonus) {
+                            var bonusParts = bonus.split(':');
+                            var bonusesName = bonusParts[0];
+                            var bonusValue = bonusParts[1];
+                            previewText += `<div class="stat-bar other">${bonusesName}: ${bonusValue}</div><br>`;
+                        });
+                }
+            }
+            $("#previewText").html(previewText);
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function getStatColorClass(statName) {
+            var offensiveStats = ['damage', 'atk_spd', 'crit', 'kb_atk'];
+            var defensiveStats = ['max_hp', 'defense', 'def_buff', 'hp_buff', 'kb_def'];
+            var manaStats = ['mana_rgn', 'max_mana'];
+
+            if (offensiveStats.includes(statName)) {
+                return 'offensive';
+            } else if (defensiveStats.includes(statName)) {
+                return 'defensive';
+            } else if (manaStats.includes(statName)) {
+                return 'mana';
+            } else {
+                return 'other';
+            }
+        }
+        function getStatDisplayName(statName) {
+            var statDisplayNameMap = {
+                max_hp: 'Maximum HP',
+                defense: 'Defense',
+                def_buff: 'Defense Buff',
+                evade: 'Evade',
+                hp_buff: 'HP Buff',
+                kb_def: 'Knockback Defense',
+                agility: 'Agility',
+                atk_spd: 'Attack Speed',
+                crit: 'Critical Chance',
+                damage: 'Damage',
+                dmg_buff: 'Damage Buff',
+                kb_atk: 'Attack Knockback',
+                mana_rgn: 'Mana Regeneration',
+                max_mana: 'Maximum Mana'
+            };
+
+            return statDisplayNameMap[statName] || statName;
+        }
+        $("#name, #desc, #rarity, #tier, #type, #class, #stats, #enhancements, #enhanceAmount, #bonuses,#bonusName").on("input", function() {
+            updatePreview();
+        });
+        function createItemCommand() {
+            var item = $("#item").val();
+            var tags = $("#tags").val();
+            var name = $("#name").val();
+            var desc = $("#desc").val();
+            var rarity = $("#rarity").val();
+            var tier = $("#tier").val();
+            var itemType = $("#type").val();
+            var itemClass = $("#class").val();
+            var stats = $("#stats").val();
+            var enhanceAmount = $("#enhanceAmount").val();
+            var enhancements = $("#enhancements").val();
+            var bonusName = $("#bonusName").val();
+            var bonuses = $("#bonuses").val();
+            
+            if (itemType.toLowerCase() === "misc") {
+                var command = `/createitem ${item}${tags}|${name}|${desc}|${rarity}#${tier}|${itemType}`;
+            } else {
+                var enhancementsPart = enhanceAmount || enhancements ? `${enhanceAmount}+${enhancements}` : "";
+                var bonusesPart = bonusName || bonuses ? `${bonusName}+${bonuses}` : "";
+
+                var command = `/createitem ${item}${tags}|${name}|${desc}|${rarity}#${tier}|${itemType}|${itemClass}|${stats}|${enhancementsPart}|${bonusesPart}`;
+            }
+
+            $("#result").text(command);
+            navigator.clipboard.writeText(command);
+        }
+
+        $("#addTag").click(function() {
+            var tagType = $("#tagType").val();
+            var newTag = "";
+
+            if (tagType === "#color") {
+                newTag = `${tagType}:${$("#color").val()}`;
+            } else if (tagType === "#head") {
+                newTag = $("#headIdValueCheckbox").prop("checked") ?
+                    `${tagType}:${$("#headId").val()}:${$("#headValue").val()}` :
+                    `${tagType}:${$("#headOwner").val()}`;
+            } else {
+                newTag = tagType;
+            }
+
+            var currentTags = $("#tags").val();
+            currentTags = currentTags ? currentTags + "#" + newTag : newTag;
+
+            $("#tags").val(currentTags);
+        });
+
+        $("#addStat").click(function() {
+            var statName = $("#statName").val();
+            var statValue = $("#statValue").val();
+
+            var currentStats = $("#stats").val();
+            currentStats = currentStats ? currentStats + `+${statName}:${statValue}` : `${statName}:${statValue}`;
+
+            $("#stats").val(currentStats);
+            updatePreview();
+        });
+        
+        $("#createButton").click(function() {
+            createItemCommand();
+        });
+    });
+</script>
+
+</body>
+</html>
