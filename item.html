@@ -273,9 +273,10 @@
 
                     data.forEach(function (file) {
                         var itemName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
+                        var displayName = capitalizeFirstLetter(itemName.replace(/_/g, ' '))
                         var itemElement = $("<div class='item' data-name='" + itemName + "'>" +
                             "<img src='" + file.download_url + "' alt='" + itemName + "' class='item-img'>" +
-                            "<div class='item-text'>" + itemName + "</div></div>");
+                            "<div class='item-text'>" + displayName + "</div></div>");
                         itemBrowser.append(itemElement);
                     });
                 } catch (error) {
