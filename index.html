@@ -20,6 +20,9 @@
         height: 100%;
         z-index: 0;
         }
+        .disable-background .gradient-bg {
+            display: none;
+        }
         .content {
             margin-left: 30px;
             margin-top: 30px;
@@ -104,6 +107,10 @@
             background-color: #333;
             color: #fff;
             overflow: hidden;
+        }
+        #background {
+            position: fixed;
+            left: 90%
         }
         #itemBrowser {
             text-align: center;
@@ -192,6 +199,7 @@
         </div>
     </div>
 <div class="content">
+    <button id="background">Disable Background</button>
     <label for="item">Item:</label>
     <input type="text" id="item">
     <button id="openItemModal" class="btn btn-primary">Open Item Browser</button><br>
@@ -319,6 +327,9 @@
         $("#openItemModal").click(function() {
                 $("#itemModal").modal("show");
                 loadItems();
+            });
+            $("#background").click(function() {
+                $("body").toggleClass("disable-background");
             });
             $("#clearStats").click(function() {
                 $("#stats").val("");
