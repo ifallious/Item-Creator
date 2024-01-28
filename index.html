@@ -537,6 +537,8 @@
             var name = applyMinecraftFormatting($("#name").val());
             var desc = applyMinecraftFormatting($("#desc").val());
             var itemType = $("#type").val();
+            var tier = parseInt($("#tier").val());
+            var tierBonus = calculateTierBonus(tier);
             var itemClass = $("#class").val();
             var stats = $("#stats").val();
             var enhancements = $("#enhancements").val();
@@ -571,10 +573,14 @@
                     var statsArray = stats.split('+');
                     statsArray.forEach(function(stat) {
                         var statParts = stat.split(':');
+                        var statValue = parseInt(statParts[1]);
+                        if (!isNaN(statValue)) {
+                            statValue += Math.round(statValue * tierBonus);
+                            statParts[1] = statValue;
+                        }
                         var statName = getStatDisplayName(statParts[0]);
-                        var statValue = statParts[1];
                         var statColorClass = getStatColorClass(statParts[0]);
-                        previewText += `<div class="stat-bar ${statColorClass}">${statName}: ${statValue}</div><br>`;
+                        previewText += `<div class="stat-bar ${statColorClass}">${statName}: ${statParts[1]}</div><br>`;
                     });
                 }
                 if (enhancements) {
@@ -602,6 +608,10 @@
                 }
             }
             $("#previewText").html(previewText);
+        }
+        function calculateTierBonus(tier) {
+            const tierBonuses = [0, 0, 0.1, 0.2, 0.35, 0.5];
+            return tierBonuses[tier] || 0;
         }
         function applyMinecraftFormatting(text) {
             var formattedText = text.replace(/&([0-9a-fklmnor])/g, function(match, group1) {
