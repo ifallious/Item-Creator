@@ -320,7 +320,7 @@
             var bonuses = $("#bonuses").val();
             var itemName = $("#item").val().replace(/\s/g, "_");
             var itemTexture = "";
-            if (["leather_leggings", "leather_boots", "leather_chestplate", "leather_helmet"].includes(itemName) && $("#tags").val().includes("#color")) {
+            if (["leather_leggings", "leather_boots", "leather_chestplate", "leather_helmet"].includes(itemName)) {
                 var color = $("#colorPicker").val();
                 itemTexture = `data:image/png;base64,${generateColoredLeatherTexture(hexToRgba(color), itemName)}`;
             } else {
