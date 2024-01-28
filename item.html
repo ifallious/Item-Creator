@@ -5,6 +5,7 @@
     <link rel="stylesheet" media="screen" href="https://fontlibrary.org//face/minecraftia" type="text/css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI7 Item Creator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: 'MinecraftiaRegular';
@@ -40,6 +41,55 @@
         .mythic { color: pink; }
         .admin { color: red; }
         .event { color: yellow; }
+        #itemModal {
+            display: none;
+        }
+        .modal-content {
+            background-color: #333;
+            color: #fff;
+        }
+        .modal-header, .modal-body {
+            border-color: #ffffff;
+        }
+        .modal-title {
+            color: #ffffff;
+        }
+        .modal-dialog {
+            margin: auto;
+            max-width: 1500px;
+        }
+        .item {
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+            line-height: 80px;
+            border: 1px solid #ccc;
+            background-color: #333;
+            color: #fff;
+            overflow: hidden;
+        }
+        #itemBrowser {
+            text-align: center;
+        }
+        .item img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 5px;
+            image-rendering: pixelated;
+        }
+        .item-text {
+            line-height: 30px;
+        }
+        #colorPicker {
+            width: 100px;
+            height: 100px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
         input[type="text"],
         button,
         select {
@@ -51,26 +101,41 @@
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
 <label for="item">Item:</label>
-<input type="text" id="item"><br>
-
+<input type="text" id="item">
+<button id="openItemModal" class="btn btn-primary">Open Item Browser</button><br>
+<div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="itemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemModalLabel">Item Browser</h5>
+                <label for="itemSearch" class="sr-only">Search Items:</label>
+                <input type="text" id="itemSearch" class="form-control" style="margin-right: 10px;" placeholder="Search Items">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="itemBrowser">
+            </div>
+        </div>
+    </div>
+</div>
+<label style="display: none;" for="colorPicker">Color:</label>
+<input type="color" id="colorPicker" style="display: none;"> <br>
 <label for="tags">Tags:</label>
 <input type="text" id="tags">
 <button id="addTag">Add Tag</button><br>
 
 <label for="tagType">Tag Type:</label>
 <select id="tagType">
-    <option value="#color">#color</option>
     <option value="#head">#head</option>
     <option value="#glow">#glow</option>
     <option value="#drop">#drop</option>
     <option value="#big_item">#big_item</option>
 </select><br>
-
-<label for="color">Color (Hex):</label>
-<input type="text" id="color"><br>
 
 <label for="headOwner">Head Owner:</label>
 <input type="text" id="headOwner"><br>
@@ -173,6 +238,68 @@
 
 <script>
     $(document).ready(function() {
+        $("#openItemModal").click(function() {
+                $("#itemModal").modal("show");
+                loadItems();
+            });
+            function updateColorPickerVisibility() {
+                var itemName = $("#item").val().replace(/\s/g, "_");
+                if (["leather_leggings", "leather_boots", "leather_chestplate", "leather_helmet"].includes(itemName)) {
+                    $("#colorPicker").show();
+                    $
+                } else {
+                    $("#colorPicker").hide();
+                }
+            }
+            function loadItems() {
+                var texturesFolder = "textures/";
+                fetch(texturesFolder)
+                    .then(response => response.text())
+                    .then(data => {
+                        var itemMatches = data.match(/href="([^"]+\.(png|jpg|jpeg|gif))"/g)
+                        if (itemMatches) {
+                            var items = itemMatches.map(match => match.match(/href="([^"]+\.(png|jpg|jpeg|gif))"/)[1]);
+                            var itemBrowser = $("#itemBrowser");
+                            itemBrowser.empty();
+                            items.forEach(function(item) {
+                                var itemName = item.replace(/^\/textures\/(.+)\.(png|jpg|jpeg|gif)$/, '$1');
+                                var displayName = capitalizeFirstLetter(itemName).replace(/_/g, ' ');
+                                var itemElement = $("<div class='item' data-name='" + itemName + "'>" +
+                                    "<img src='" + texturesFolder + itemName + ".png' alt='" + itemName + "' class='item-img'>" +
+                                    "<div class='item-text'>" + displayName + "</div></div>");
+                                itemBrowser.append(itemElement);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching item names:", error);
+                    });
+            }
+            function filterItems() {
+                var searchInput = $("#itemSearch").val().toLowerCase();
+                $(".item").filter(function() {
+                    $(this).toggle($(this).find('.item-text').text().toLowerCase().indexOf(searchInput) > -1);
+                });
+            }
+            $("#item").on("input", function () {
+                updateColorPickerVisibility();
+                updateLeatherArmorTexture();
+                updatePreview();
+            });
+            $("#colorPicker").on("input", function () {
+                updateLeatherArmorTexture();
+            });
+            $("#itemSearch").on("input", function() {
+                filterItems();
+            });
+            $(document).on("click", ".item", function() {
+                var itemName = $(this).data("name");
+                var itemNameWithSpaces = itemName.replace(/_/g, ' ');
+                $("#item").val(itemNameWithSpaces);
+                $("#itemModal").modal("hide");
+                updatePreview();
+                updateColorPickerVisibility()
+            });
         function updatePreview() {
             var name = $("#name").val();
             var desc = $("#desc").val();
@@ -184,7 +311,13 @@
             var bonusName = $("bonusName").val();
             var bonuses = $("#bonuses").val();
             var itemName = $("#item").val().replace(/\s/g, "_");
-            var itemTexture = `textures/${itemName}.png`;
+            var itemTexture = "";
+            if (["leather_leggings", "leather_boots", "leather_chestplate", "leather_helmet"].includes(itemName) && $("#tags").val().includes("#color")) {
+                var color = $("#colorPicker").val();
+                itemTexture = `data:image/png;base64,${generateColoredLeatherTexture(hexToRgba(color), itemName)}`;
+            } else {
+                itemTexture = `textures/${itemName}.png`;
+            }
             var previewText = `<img src="${itemTexture}" alt="${name}" style="width: 150px; float: right; margin-left: 10px; image-rendering: pixelated;">`;
             previewText += `<div style="text-align: left;">`;
             previewText += `<div style="text-align: center; margin-bottom: 5px;">${name}</div>`;
@@ -229,11 +362,48 @@
             }
             $("#previewText").html(previewText);
         }
+        function updateLeatherArmorTexture() {
+            var itemName = $("#item").val().replace(/\s/g, "_");
+            
+            if (["leather_leggings", "leather_boots", "leather_chestplate", "leather_helmet"].includes(itemName)) {
+                var color = $("#colorPicker").val();
+                var coloredTexture = generateColoredLeatherTexture(hexToRgba(color), itemName);
+                $("#preview img").attr("src", `data:image/png;base64,${coloredTexture}`);
+            }
+        }
 
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
-
+        function generateColoredLeatherTexture(color, itemName) {
+            var canvas = document.createElement("canvas");
+            canvas.width = 16;
+            canvas.height = 16;
+            var ctx = canvas.getContext("2d");
+            var img = new Image();
+            img.src = `textures/${itemName}.png`;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var data = imageData.data;
+            for (var i = 0; i < data.length; i += 4) {
+                if (data[i + 3] > 0) { 
+                    data[i] = (1 - 0.7) * data[i] + 0.7 * color[0];
+                    data[i + 1] = (1 - 0.7) * data[i + 1] + 0.7 * color[1];
+                    data[i + 2] = (1 - 0.7) * data[i + 2] + 0.7 * color[2];
+                    data[i + 3] = 255;
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+            return canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
+        }
+        function hexToRgba(hex) {
+            hex = hex.replace(/^#/, '');
+            var bigint = parseInt(hex, 16);
+            var r = (bigint >> 16) & 255;
+            var g = (bigint >> 8) & 255;
+            var b = bigint & 255;
+            return [r, g, b, 255];
+        }
         function getStatColorClass(statName) {
             var offensiveStats = ['damage', 'atk_spd', 'crit', 'kb_atk'];
             var defensiveStats = ['max_hp', 'defense', 'def_buff', 'hp_buff', 'kb_def'];
@@ -332,6 +502,11 @@
         });
         
         $("#createButton").click(function() {
+            var itemName = $("#item").val().replace(/\s/g, "_");
+            if (["leather_leggings", "leather_boots", "leather_chestplate", "leather_helmet"].includes(itemName)) {
+                var color = $("#colorPicker").val();
+                $("#tags").val($("#tags").val() + `#${color}`); 
+            }
             createItemCommand();
         });
     });
