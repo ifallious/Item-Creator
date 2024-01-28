@@ -251,29 +251,27 @@
                     $("#colorPicker").hide();
                 }
             }
-            function loadItems() {
-                var texturesFolder = "textures/";
-                fetch(texturesFolder)
-                    .then(response => response.text())
-                    .then(data => {
-                        var itemMatches = data.match(/href="([^"]+\.(png|jpg|jpeg|gif))"/g)
-                        if (itemMatches) {
-                            var items = itemMatches.map(match => match.match(/href="([^"]+\.(png|jpg|jpeg|gif))"/)[1]);
-                            var itemBrowser = $("#itemBrowser");
-                            itemBrowser.empty();
-                            items.forEach(function(item) {
-                                var itemName = item.replace(/^\/textures\/(.+)\.(png|jpg|jpeg|gif)$/, '$1');
-                                var displayName = capitalizeFirstLetter(itemName).replace(/_/g, ' ');
-                                var itemElement = $("<div class='item' data-name='" + itemName + "'>" +
-                                    "<img src='" + texturesFolder + itemName + ".png' alt='" + itemName + "' class='item-img'>" +
-                                    "<div class='item-text'>" + displayName + "</div></div>");
-                                itemBrowser.append(itemElement);
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching item names:", error);
+            async function loadItems() {
+                const user = 'ifallious';
+                const repo = 'Item-Creator';
+                const folder = 'textures';
+                try {
+                    const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${folder}`);
+                    const data = await response.json();
+
+                    var itemBrowser = $("#itemBrowser");
+                    itemBrowser.empty();
+
+                    data.forEach(function (file) {
+                        var itemName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
+                        var itemElement = $("<div class='item' data-name='" + itemName + "'>" +
+                            "<img src='" + file.download_url + "' alt='" + itemName + "' class='item-img'>" +
+                            "<div class='item-text'>" + itemName + "</div></div>");
+                        itemBrowser.append(itemElement);
                     });
+                } catch (error) {
+                    console.error("Error fetching item names:", error);
+                }
             }
             function filterItems() {
                 var searchInput = $("#itemSearch").val().toLowerCase();
