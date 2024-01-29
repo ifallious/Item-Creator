@@ -170,6 +170,9 @@
             margin-bottom: 5px;
             border-radius: 5px;
         }
+        input[type="text"] {
+            width: 300px;
+        }
         select::-ms-expand {
             display: none;
         }
@@ -302,7 +305,6 @@
         <option value="event">Event</option>
         <option value="admin">Admin</option>
     </select><br>
-
     <label for="tier">Tier:</label>
     <select id="tier">
         <option value="1">1</option>
@@ -310,13 +312,16 @@
         <option value="3">3</option>
         <option value="4">4</option>
         <option value="5">5</option>
-    </select><br>
+    </select>
+    <label for="floor">Floor:</label>
+    <input type="text" style="width: 50px;" id="floornum"><br>
 
     <label for="type">Type:</label>
     <select id="type">
         <option value="Armor">Armor</option>
         <option value="Weapon">Weapon</option>
         <option value="Misc">Misc</option>
+        <option value="Rune">Rune</option>
         <option value="offhand">Offhand</option>
     </select><br>
 
@@ -541,6 +546,7 @@
             var tierBonus = calculateTierBonus(tier);
             var itemClass = $("#class").val();
             var stats = $("#stats").val();
+            var floor = $("#floornum").val();
             var enhancements = $("#enhancements").val();
             var enhancementnumber = $("#enhanceAmount").val();
             var bonusName = $("#bonusName").val();
@@ -568,6 +574,7 @@
             var rarity = $("#rarity").val().toLowerCase();
             var rarityColorClass = rarity;
             previewText += `<span style="color: white;">Rarity: </span><span class="rarity ${rarityColorClass}">${capitalizeFirstLetter(rarity)}</span><br>`;
+            previewText += `<span style="color: white;">Floor: </span><span style="color: lightblue;">${floor}⚐</span><br>`;
             if (itemType !== "Misc") {
                 if (stats) {
                     var statsArray = stats.split('+');
@@ -729,6 +736,7 @@
             var name = $("#name").val();
             var desc = $("#desc").val();
             var rarity = $("#rarity").val();
+            var floor = $("#floornum").val();
             var tier = $("#tier").val();
             var itemType = $("#type").val();
             var itemClass = $("#class").val();
@@ -739,12 +747,16 @@
             var bonuses = $("#bonuses").val();
             
             if (itemType.toLowerCase() === "misc") {
-                var command = `/createitem ${item}${tags}|${name}|${desc}|${rarity}#${tier}|${itemType}`;
-            } else {
+                var command = `/createitem ${item}${tags}|${name}|${desc}|${rarity}#${floor}#${tier}|${itemType}`;
+            } 
+            else if (itemType.toLowerCase()=== "rune"){
+                var command = `/createitem ${item}${tags}|${name}|${desc}|${rarity}#${floor}|${itemType}|${stats}`;
+            }
+            else {
                 var enhancementsPart = enhanceAmount || enhancements ? `${enhanceAmount}+${enhancements}` : "";
                 var bonusesPart = bonusName || bonuses ? `${bonusName}+${bonuses}` : "";
 
-                var command = `/createitem ${item}${tags}|${name}|${desc}|${rarity}#${tier}|${itemType}|${itemClass}|${stats}|${enhancementsPart}|${bonusesPart}`;
+                var command = `/createitem ${item}${tags}|${name}|${desc}|${rarity}#${floor}#${tier}|${itemType}|${itemClass}|${stats}|${enhancementsPart}|${bonusesPart}`;
             }
 
             $("#result").text(command);
