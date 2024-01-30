@@ -11,8 +11,16 @@
     crossorigin="anonymous"
     ></script>
     <style>
+        @font-face {
+            font-family: 'Minecraftia Regular';
+            font-style: normal;
+            font-weight: normal;
+            src: local('Minecraftia Regular'), url('Minecraftia.woff') format('woff');
+            }
         body {
-            font-family: 'MinecraftiaRegular';
+            font-family: 'Minecraftia Regular';
+            font-weight: normal;
+            font-style: normal;
             color: #ffffff;
             margin: 0;
             padding: 0;
@@ -55,6 +63,32 @@
             position: absolute;
             top: 0;
             left: 0;
+        }
+        #headIdValueCheckbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background: rgba(40,40,40,0.3);
+            color:black;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            position: relative;
+            left: -5px;
+            bottom: -5px;
+        }
+
+        #headIdValueCheckbox:checked {
+            background: rgba(40,40,40,0.8);
+        }
+
+
+        .checkbox-container {
+            display: inline-block;
+            width: 200px;
+            height: 20px;
+            overflow: hidden;
         }
         #preview {
             font-size: 15px;
@@ -285,9 +319,8 @@
 
     <label for="headValue">Head Value:</label>
     <input type="text" id="headValue"><br>
-
-    <input type="checkbox" id="headIdValueCheckbox"> Use ID/Value<br><br>
-
+    <div class="checkbox-container"><input type="checkbox" id="headIdValueCheckbox"> Use ID/Value</div><br><br>
+    
     <label for="name">Name:</label>
     <input type="text" id="name"><br>
 
@@ -375,11 +408,11 @@
     <label for="statValue">Stat Value:</label>
     <input type="text" id="statValue"><br>
 
-    <button id="createButton">Create Item Command</button><br>
+    <button id="createButton">Create Item Command</button>
+    <button id="importItemButton" class="btn btn-primary">Import Item from command</button><br>
 
     <label for="result">Result:</label>
     <p id="result"></p>
-    <button id="importItemButton" class="btn btn-primary">Import Item</button>
     <div id="preview">
         <p id="previewText"></p>
     </div>
@@ -568,15 +601,17 @@
             previewText += `<div style="text-align: left;">`;
             //previewText += `<span style="color: lightgrey; text-align: center; display: block; margin-bottom: 10px;">${desc}</span><br>`;
             if (itemType !== "Misc"&& itemClass !== "") {
-            previewText += `<span style="color: white;text-align: left;">Class: </span><span style="color: blue;">${itemClass}</span><br>`;
+            previewText += `<span style="color: white;text-align: left;">Class </span><span style="color: blue;">${itemClass}</span><br>`;
             }
-            previewText += `<span style="color: white;">Type: </span><span style="color: lightgreen;">${itemType}</span><br>`;
+            previewText += `<span style="color: white;">Type </span><span style="color: lightgreen;">${itemType}</span><br>`;
             var rarity = $("#rarity").val().toLowerCase();
             var rarityColorClass = rarity;
-            previewText += `<span style="color: white;">Rarity: </span><span class="rarity ${rarityColorClass}">${capitalizeFirstLetter(rarity)}</span><br>`;
-            previewText += `<span style="color: white;">Floor: </span><span style="color: lightblue;">${floor}⚐</span><br>`;
+            previewText += `<span style="color: white;">Rarity </span><span class="rarity ${rarityColorClass}">${capitalizeFirstLetter(rarity)}</span><br>`;
+            previewText += `<span style="color: white;">Floor </span><span style="color: lightblue;">${floor}⚐</span><br>`;
             if (itemType !== "Misc") {
                 if (stats) {
+                    previewText += `<br>`;
+                    previewText += `<div>Stats</div><br>`;
                     var statsArray = stats.split('+');
                     statsArray.forEach(function(stat) {
                         var statParts = stat.split(':');
@@ -589,6 +624,7 @@
                         var statColorClass = getStatColorClass(statParts[0]);
                         previewText += `<div class="stat-bar ${statColorClass}">${statName}: ${statParts[1]}</div><br>`;
                     });
+                    previewText += `<div>Tier</div><div style="color: orange;">${tier}</div><br>`;
                 }
                 if (enhancements) {
                     var enhancementsArray = enhancements.split('+');
