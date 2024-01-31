@@ -27,6 +27,56 @@
             font-size: small;
             background-color: rgb(18, 14, 96);
         }
+        #attention {
+            position: fixed;
+            top: 70%;
+            left: 50%;
+        }
+        #itemModal {
+            display: none;
+            font-size: 12px;
+        }
+        .modal-content {
+            background-color: #333;
+            color: #fff;
+        }
+        .modal {
+            z-index: 1050;
+        }
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #333;
+        }
+        .modal-body {
+            border-color: #ffffff;
+            padding-top: 60px;
+            overflow-y: auto;
+        }
+        .modal-title {
+            color: #ffffff;
+        }
+        .modal-dialog {
+            margin: auto;
+            max-width: 1500px;
+        }
+        .item {
+            z-index: 999;
+            border-radius: 5px;
+            width: 170px;
+            height: 170px;
+            margin: 5px;
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+            line-height: 80px;
+            border: 1px solid #ccc;
+            background-color: #333;
+            color: #fff;
+            overflow: hidden;
+        }
+        
         .darkred { color: #AA0000; }
         .red { color: #FF5555; }
         .gold { color: #FFAA00; }
@@ -47,6 +97,18 @@
         .strikethrough { text-decoration: line-through; }
         .underline { text-decoration: underline; }
         .italic { font-style: italic; }
+        .offensive { color: #FF5555; }
+        .defensive { color: #55FF55; }
+        .mana { color: #55FFFF; }
+        .other { color: #FF55FF; }
+        .common { color: #AAAAAA; }
+        .uncommon { color: #55FF55; }
+        .rare { color: #00AAAA; }
+        .epic { color: #AA00AA; }
+        .legendary { color: #FFAA00 }
+        .mythic { color: #FF55FF; }
+        .admin { color: #FF5555; }
+        .event { color: #FFFF55; }
 
         .gradient-bg {
         width: 100%;
@@ -112,65 +174,17 @@
             display: inline-block;
             margin-right: 10px;
         }
-        .offensive { color: red; }
-        .defensive { color: rgb(0, 255, 0); }
-        .mana { color: blue; }
-        .other { color: purple; }
-        .common { color: grey; }
-        .uncommon { color: lightgreen; }
-        .rare { color: lightblue; }
-        .epic { color: rgb(161, 2, 161); }
-        .legendary { color: yellow; }
-        .mythic { color: pink; }
-        .admin { color: red; }
-        .event { color: yellow; }
-        #itemModal {
-            display: none;
-            font-size: 12px;
-        }
-        .modal-content {
-            background-color: #333;
-            color: #fff;
-        }
-        .modal {
-            z-index: 1050;
-        }
-        .modal-header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background-color: #333;
-        }
-        .modal-body {
-            border-color: #ffffff;
-            padding-top: 60px;
-            overflow-y: auto;
-        }
-        .modal-title {
-            color: #ffffff;
-        }
-        .modal-dialog {
-            margin: auto;
-            max-width: 1500px;
-        }
-        .item {
-            z-index: 999;
-            border-radius: 5px;
-            width: 170px;
-            height: 170px;
-            margin: 5px;
-            display: inline-block;
-            cursor: pointer;
-            text-align: center;
-            line-height: 80px;
-            border: 1px solid #ccc;
-            background-color: #333;
-            color: #fff;
-            overflow: hidden;
-        }
+        
+        
         #background {
             position: fixed;
-            left: 90%
+            right: 10px;
+            top: 10px;
+        }
+        #attentionspan {
+            position: fixed;
+            right: 10px;
+            top: 50px;
         }
         #itemBrowser {
             text-align: center;
@@ -291,8 +305,10 @@
             </div>
         </div>
     </div>
+
 <div class="content">
-    <button id="background">Toggle Fancy Background</button>
+    <button id="background">Fancy Background</button>
+    <button id="attentionspan" onclick="MuteAndHide()">Attentionspan</button>
     <label for="item">Item:</label>
     <input type="text" id="item">
     <button id="openItemModal" class="btn btn-primary">Open Item Browser</button><br>
@@ -355,7 +371,7 @@
         <option value="Weapon">Weapon</option>
         <option value="Misc">Misc</option>
         <option value="Rune">Rune</option>
-        <option value="offhand">Offhand</option>
+        <option value="Offhand">Offhand</option>
     </select><br>
 
     <label for="class">Class:</label>
@@ -416,7 +432,25 @@
     <div id="preview">
         <p id="previewText"></p>
     </div>
+    <video width="500px" height="338px" autoplay="true" id="attention">
+        <source src="https://cdn.gilcdn.com/ContentMediaGenericFiles/b0e4e978f33b43d0694d8bcf900b30d1-Full.mp4?w=1280&h=720&ia=1" type="video/mp4" />
+       </video>
 </div>
+<script>
+    function MuteAndHide() {
+      var video = document.getElementById('attention');
+      if (video.paused) {
+        video.play();
+        } else {
+        video.pause();
+        }
+      if (video.style.display === 'none') {
+        video.style.display = 'block';
+      } else {
+        video.style.display = 'none';
+      }
+    }
+  </script>
 <script>
     $(document).ready(function() {
         function checkBackgroundPreference() {
@@ -594,24 +628,30 @@
             }
             var previewText = `<img src="${itemTexture}" alt="" style="width: 150px; float: right; margin-left: 10px; image-rendering: pixelated;">`;
            //previewText += `<div style="text-align: center; margin-bottom: 5px;">${name}</div>`;
-            previewText += name
-            previewText += "<br>"
-            previewText += desc 
-            previewText += "<br>"
+            previewText += `<div style="font-weight: bold; color: #FFFFFF;">${name}</div>`
+            previewText += `<div style="color: #AAAAAA;">${desc}</div>`;
+            previewText += "<br>";
             previewText += `<div style="text-align: left;">`;
             //previewText += `<span style="color: lightgrey; text-align: center; display: block; margin-bottom: 10px;">${desc}</span><br>`;
             if (itemType !== "Misc"&& itemClass !== "") {
-            previewText += `<span style="color: white;text-align: left;">Class </span><span style="color: blue;">${itemClass}</span><br>`;
+            previewText += `<span style="color: #FFFFFF;text-align: left;font-weight: bold;">Class </span><span style="color: #0000AA;">${itemClass}</span><br>`;
             }
-            previewText += `<span style="color: white;">Type </span><span style="color: lightgreen;">${itemType}</span><br>`;
+            previewText += `<span style="color: #FFFFFF;font-weight: bold;">Type </span><span style="color: #55FF55;">${itemType}</span><br>`;
             var rarity = $("#rarity").val().toLowerCase();
             var rarityColorClass = rarity;
-            previewText += `<span style="color: white;">Rarity </span><span class="rarity ${rarityColorClass}">${capitalizeFirstLetter(rarity)}</span><br>`;
-            previewText += `<span style="color: white;">Floor </span><span style="color: lightblue;">${floor}⚐</span><br>`;
+            previewText += `<span style="color: #FFFFFF;font-weight: bold;">Rarity </span><span class="rarity ${rarityColorClass}">${capitalizeFirstLetter(rarity)}</span><br>`;
+            previewText += `<span style="color: #FFFFFF;font-weight: bold;">Floor </span><span style="color: #55FFFF;">${floor}⚐</span><br>`;
             if (itemType !== "Misc") {
+                var totalscore = 0.0;
+                if (itemClass !== "") {
+                    totalscore += 1;
+                }
+                var tempscore = 0.0;
+                var itemWeight = 1.0;
                 if (stats) {
+                    tempscore += calculateScore(stats, 1);
                     previewText += `<br>`;
-                    previewText += `<div>Stats</div><br>`;
+                    previewText += `<div style="font-weight: bold;color: #FFFFFF;">Stats</div>`;
                     var statsArray = stats.split('+');
                     statsArray.forEach(function(stat) {
                         var statParts = stat.split(':');
@@ -622,35 +662,99 @@
                         }
                         var statName = getStatDisplayName(statParts[0]);
                         var statColorClass = getStatColorClass(statParts[0]);
-                        previewText += `<div class="stat-bar ${statColorClass}">${statName}: ${statParts[1]}</div><br>`;
+                        previewText += `<div style="color: #AAAAAA;">• ${statName} <span class="stat-bar ${statColorClass}">${statParts[1]}</span></div>`;
                     });
-                    previewText += `<div>Tier</div><div style="color: orange;">${tier}</div><br>`;
+                    previewText += `<div style="color: #AAAAAA;">• Tier <span style="color: #FFAA00;">${tier}</span></div>`;
                 }
                 if (enhancements) {
+                    tempscore += calculateScore(enhancements, 0.25);
+                    totalscore += enhancementnumber * 3;
                     var enhancementsArray = enhancements.split('+');
-                    previewText += `Enhancements: ${enhancementnumber}<br>`;
+                    previewText += `<br><div style="font-weight: bold; color: #FFFFFF;">Enhancements: ${enhancementnumber}</div>`;
                     enhancementsArray.forEach(function (enhancement) {
                         var enhancementParts = enhancement.split(':');
                         var enhancementName = getStatDisplayName(enhancementParts[0]);
                         var enhancementValue = enhancementParts[1];
                         var enhancementColorClass = getStatColorClass(enhancementParts[0]);
-                        previewText += `<div class="stat-bar ${enhancementColorClass}">${enhancementName}: ${enhancementValue}</div><br>`;
+                        previewText += `<div style="color: #AAAAAA;">• ${enhancementName} <span class="stat-bar ${enhancementColorClass}">${enhancementValue}</span></div>`;
                     });
                 }
                 if (itemType == "Armor") {
+                    itemWeight = getItemWeight(itemName)
                     if (bonuses) {    
+                        tempscore += calculateScore(bonuses, 0.25);
                         var bonusesArray = bonuses.split('+');
-                        previewText += `Full Set Bonus: ${bonusName}<br>`;
+                        previewText += `<br><div style="font-weight: bold; color: #FFFFFF;">Full Set Bonus: <span style="font-weight: normal;">${bonusName}</span></div>`;
                         bonusesArray.forEach(function (bonus) {
                             var bonusParts = bonus.split(':');
                             var bonusesName = getStatDisplayName(bonusParts[0]);
                             var bonusValue = bonusParts[1];
                             var bonusColorClass = getStatColorClass(bonusParts[0]);
-                            previewText += `<div class="stat-bar ${bonusColorClass}">${bonusesName}: ${bonusValue}</div><br>`;
+                            previewText += `<div style="color: #AAAAAA;">• ${bonusesName} <span class="stat-bar ${bonusColorClass}">${bonusValue}</span></div>`;
                 })}
                 }
+                if (itemType == "Weapon") {
+                    tempitemWeight = getItemWeight(itemName);
+                    if (tempitemWeight == 1.33) {
+                        itemWeight = 1;
+                    } else {
+                        itemWeight = tempitemWeight;
+                    }
+                }
+                if (itemType == "Offhand" || itemType == "Rune") {
+                    itemWeight = 2.70
+                }
+                totalscore += itemWeight * tempscore;
+                totalscore += 3
+                totalscore += -3* floor;
+                previewText += `<div style="color: lightgrey; font-style: italic;">(Score: ${totalscore})</div>`;
             }
             $("#previewText").html(previewText);
+        }
+        function getItemWeight(itemName) {
+            itemName = itemName.toLowerCase();
+            var itemValue;
+            if (itemName === "bow") {
+                itemValue = 0.67;
+            } else if (itemName === "blaze_rod") {
+                itemValue = 1.3;
+            } else if (itemName.includes("chestplate")) {
+                itemValue = 1;
+            } else if (itemName.includes("leggings")) {
+                itemValue = 1.09;
+            } else if (itemName.includes("boots")) {
+                itemValue = 1.4;
+            } else if (itemName.includes("sword")) {
+                itemValue = 1;
+            } else {
+                itemValue = 1.33;
+            }
+            return itemValue;
+        }
+        function calculateScore(stats, mult) {
+            const statComponents = stats.split('+');
+            const statWeights = {
+                'damage': 1.5,
+                'dmg_buff': 0.2,
+                'atk_spd': 0.3,
+                'crit': 0.5,
+                'kb_atk': 0.1,
+                'defense': 0.5,
+                'def_buff': 0.2,
+                'max_hp': 1,
+                'hp_buff': 0.4,
+                'kb_def': 0.1,
+                'max_mana': 0.8,
+                'mana_rgn': 0.6,
+                'agility': 0.1,
+                'evade': 0.6
+            };
+            const totalScore = statComponents.reduce((score, stat) => {
+                const [statName, statValue] = stat.split(':');
+                const weight = statWeights[statName] || 0;
+                return score + weight * (statValue * mult);
+            }, 0);
+            return totalScore;
         }
         function calculateTierBonus(tier) {
             const tierBonuses = [0, 0, 0.1, 0.2, 0.35, 0.5];
