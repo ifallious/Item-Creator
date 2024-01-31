@@ -432,9 +432,12 @@
     <div id="preview">
         <p id="previewText"></p>
     </div>
-    <video width="500px" height="338px" autoplay="true" id="attention">
+    <video width="500px" height="338px" id="attention">
         <source src="https://cdn.gilcdn.com/ContentMediaGenericFiles/b0e4e978f33b43d0694d8bcf900b30d1-Full.mp4?w=1280&h=720&ia=1" type="video/mp4" />
        </video>
+    <script>
+        document.getElementById('attention').play();
+    </script>
 </div>
 <script>
     function MuteAndHide() {
